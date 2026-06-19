@@ -8,7 +8,27 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    std::cout << "SDL2 importado e inicializado com sucesso!" << std::endl;
+    // Flags de execução
+    bool rodando = true;
+    SDL_Event evento;
+
+    // Ponteiro vazio para o controle
+    SDL_GameController* controle = nullptr;
+
+    // Verifica quantos controles estão conectados
+    for(int i = 0; i < SDL_NumJoysticks(); i++){ // Passa por todos os dispositivos conectados
+        // Verifica se o dispositivo é um controle 
+        if(SDL_IsGameController(i)){
+            // Se é um controle então o controle 'mestre' será o primeiro
+            controle = SDL_GameControllerOpen(i);
+            std::cout << "Controle encontrado " << SDL_GameControllerName(controle);
+            break;
+        }
+    }
+
+    if(controle){
+        SDL_GameControllerClose(controle);
+    }
 
     // Fecha o SDL corretamente antes de sair
     SDL_Quit();
