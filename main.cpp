@@ -20,7 +20,7 @@
 int main(int argc, char* argv[]) {
 
     // Tenta inicializar o subsistema de controle do SDL
-    if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0) {
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_VIDEO) != 0) {
         std::cerr << "Erro ao inicializar o SDL: " << SDL_GetError() << std::endl;
         return -1;
     }
@@ -57,6 +57,12 @@ int main(int argc, char* argv[]) {
 
     // Roda até o usuário pedir para parar
     while(rodando){
+
+        SDL_Event lixo;
+        while(SDL_PollEvent(&lixo)){
+            // Tirar os itens antigos da fila para não travar
+        }
+
         // Recebe os eventos de entrada dos dispositivos conectados
         meuControle.atualizarEventos();
 
