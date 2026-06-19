@@ -1,0 +1,8 @@
+# Ignora os testes
+/test
+
+# ignora as configurações do
+/.vscode
+
+# Ignora as builds do CMake
+/build
