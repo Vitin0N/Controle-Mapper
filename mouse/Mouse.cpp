@@ -58,3 +58,27 @@ void Mouse::cliqueDireito(bool clicado){
         SendInput(1, &input, sizeof(INPUT));
     #endif
 }
+
+void Mouse::scroll(int scrollX, int scrollY){
+        #ifdef _WIN32
+
+        if(scrollY != 0){
+            INPUT input = { 0 };
+            input.type = INPUT_MOUSE;
+            input.mi.dwFlags = MOUSEEVENTF_WHEEL;
+
+            input.mi.mouseData = scrollY;
+            SendInput(1, &input, sizeof(INPUT));
+        }
+
+        if(scrollX != 0){
+            INPUT input = { 0 };
+            input.type = INPUT_MOUSE;
+            input.mi.dwFlags = 0x01000; // Movimentação do scroll na horizontal
+
+            input.mi.mouseData = scrollX;
+            SendInput(1, &input, sizeof(INPUT));
+        }
+        
+    #endif
+}

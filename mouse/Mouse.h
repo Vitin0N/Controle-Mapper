@@ -8,4 +8,7 @@ class Mouse {
         // Função de clique de botão
         void cliqueEsquerdo(bool clicado);
         void cliqueDireito(bool clicado);
+
+        // Função de Scroll
+        void scroll(int rolagemX, int rolagemY);
 };

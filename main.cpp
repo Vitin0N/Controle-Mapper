@@ -15,11 +15,12 @@
 
 // Zona morta do analogico do controle
 #define ZONA_MORTA 5000
+#define VELOCIDADE_SCROLL 350
 
 int main(int argc, char* argv[]) {
 
     // Tenta inicializar o subsistema de controle do SDL
-    if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0) {
         std::cerr << "Erro ao inicializar o SDL: " << SDL_GetError() << std::endl;
         return -1;
     }
@@ -86,6 +87,24 @@ int main(int argc, char* argv[]) {
         // Caso exista alguma velocidade então o mouse é movido
         if(velocidadeLX != 0 || velocidadeLY != 0){
             meuMouse.mover(velocidadeLX, velocidadeLY);
+        }
+
+        int eixoRX = meuControle.getEixos(ControllerMap::RIGHT_X);
+        int eixoRY = meuControle.getEixos(ControllerMap::RIGHT_Y);
+
+        int scrollX = 0;
+        int scrollY = 0;
+
+        if(abs(eixoRY) > ZONA_MORTA){
+            scrollY = (eixoRY / VELOCIDADE_SCROLL) * -1; // Deixa invertido
+        }
+
+        if(abs(eixoRX) > ZONA_MORTA){
+            scrollY = (eixoRX / VELOCIDADE_SCROLL);
+        }
+
+        if(scrollX != 0 || scrollY != 0){
+            meuMouse.scroll(scrollX, scrollY);
         }
 
         // Verifica se os gatilhos forma precionado mais da metade
