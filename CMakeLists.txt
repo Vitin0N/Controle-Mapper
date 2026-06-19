@@ -18,7 +18,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SDL2)
 
 # Adiciona o seu executável
-add_executable(${PROJECT_NAME} main.cpp controller/Controller.cpp)
+add_executable(${PROJECT_NAME} main.cpp controller/Controller.cpp mouse/Mouse.cpp)
 
 # Linka a biblioteca do SDL2 ao seu projeto
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2-static)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2-static) 

@@ -44,6 +44,8 @@ namespace ControllerMap
     constexpr SDL_GameControllerAxis LEFT_X = SDL_CONTROLLER_AXIS_LEFTX;
     constexpr SDL_GameControllerAxis LEFT_Y = SDL_CONTROLLER_AXIS_LEFTY;
 
+    constexpr SDL_GameControllerAxis TRIGGER_LEFT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+    constexpr SDL_GameControllerAxis TRIGGER_RIGHT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
     constexpr SDL_GameControllerAxis RIGHT_X = SDL_CONTROLLER_AXIS_RIGHTX;
     constexpr SDL_GameControllerAxis RIGHT_Y = SDL_CONTROLLER_AXIS_RIGHTY;
 
