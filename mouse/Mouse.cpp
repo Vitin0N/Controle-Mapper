@@ -31,10 +31,11 @@ void Mouse::cliqueEsquerdo(bool clicado){
         INPUT input = { 0 };
         input.type = INPUT_MOUSE;
 
+        // Verifica se clicado
         if(clicado){
-            input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+            input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN; // Aperta o botão
         } else {
-            input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+            input.mi.dwFlags = MOUSEEVENTF_LEFTUP; // Solta o botão
         }
 
         SendInput(1, &input, sizeof(INPUT));
@@ -46,11 +47,12 @@ void Mouse::cliqueDireito(bool clicado){
     #ifdef _WIN32
         INPUT input = { 0 };
         input.type = INPUT_MOUSE;
-
+        
+        // Verifica se clicado
         if(clicado){
-            input.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+            input.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN; // Aperta o botão
         } else {
-            input.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+            input.mi.dwFlags = MOUSEEVENTF_RIGHTUP; // Solta o botão
         }
 
         SendInput(1, &input, sizeof(INPUT));

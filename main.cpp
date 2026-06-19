@@ -3,6 +3,13 @@
 #include "controller/Controller.h"
 #include "controller/Controller_Map.h"
 #include "mouse/Mouse.h"
+#include "keyboard/Keyboard.h"
+
+
+// Importa o windows.h caso estejamos em sistemas windows
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 
 // Variaveis globais
 
@@ -22,6 +29,9 @@ int main(int argc, char* argv[]) {
 
     // Criando um mouse virtual
     Mouse meuMouse;
+
+    // Criando um teclado virtual
+    Keyboard meuTeclado;
     
     // Verifica se há algum conectado
     if(!meuControle.conectar()){
@@ -37,6 +47,12 @@ int main(int argc, char* argv[]) {
     // Define os triggers como não clicados ainda
     bool lt_pressionado = false;
     bool rt_pressionado = false;
+
+    // Define se botões padrão estão apertados
+    bool botao_UP_apertado = false;
+    bool botao_DOWN_apertado = false;
+    bool botao_LEFT_apertado = false;
+    bool botao_RIGHT_apertado = false;
 
     // Roda até o usuário pedir para parar
     while(rodando){
@@ -92,6 +108,40 @@ int main(int argc, char* argv[]) {
         } else if(!deveClicarRT && rt_pressionado){
             meuMouse.cliqueDireito(false);
             rt_pressionado = false;
+        }
+
+        // Funções de teclado
+        bool botaoUP = meuControle.isBotaoPressionado(ControllerMap::DPAD_UP);
+        bool botaoDOWN = meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN);
+        bool botaoLEFT = meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT);
+        bool botaoRIGHT = meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT);
+
+        // Botão UP pressionada pela setinha do controle
+        if(botaoUP){
+            meuTeclado.apertaTecla(VK_UP, true);
+        } else {
+            meuTeclado.apertaTecla(VK_UP, false);
+        }
+
+        // Botão DOWN pressionada pela setinha do controle
+        if(botaoDOWN){
+            meuTeclado.apertaTecla(VK_DOWN, true);
+        } else {
+            meuTeclado.apertaTecla(VK_DOWN, false);
+        }
+
+        // Botão LEFT pressionada pela setinha do controle
+        if(botaoLEFT){
+            meuTeclado.apertaTecla(VK_LEFT, true);
+        } else {
+            meuTeclado.apertaTecla(VK_LEFT, false);
+        }
+
+        // Botão RIGHT pressionada pela setinha do controle
+        if(botaoRIGHT){
+            meuTeclado.apertaTecla(VK_RIGHT, true);
+        } else {
+            meuTeclado.apertaTecla(VK_RIGHT, false);
         }
 
         SDL_Delay(50); // Espera 50ms antes de ler uma nova entrada
