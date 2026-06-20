@@ -28,7 +28,7 @@ O código foi construído com foco em modularidade, separando a lógica de leitu
 * `/mouse`: Lida com a injeção nativa de movimento, scroll e cliques (via `SendInput` no Windows).
 * `/keyboard`: Gerencia a injeção de teclas virtuais e atalhos de sistema.
 
-## ⚙️ Pré-requisitos para Compilação
+## Pré-requisitos para Compilação
 
 Para compilar este projeto a partir do código-fonte, você precisará de:
 
@@ -37,7 +37,7 @@ Para compilar este projeto a partir do código-fonte, você precisará de:
 
 *A biblioteca SDL2 é baixada e linkada automaticamente pelo CMake no momento da compilação, não sendo necessária instalação manual.*
 
-## 🛠️ Como Compilar e Executar (Windows)
+## Como Compilar e Executar (Windows)
 
 1. Clone o repositório ou baixe os arquivos fonte.
 2. Abra a pasta raiz do projeto no seu terminal ou VS Code.
@@ -61,7 +61,7 @@ cmake --build .
 
 > **Aviso de Permissões:** Para que o controle consiga clicar em janelas executadas como Administrador (como Gerenciador de Tarefas ou instaladores), é necessário iniciar o `ControleMapper.exe` também como Administrador.
 
-## 🗺️ Roadmap (Próximos Passos)
+## Roadmap (Próximos Passos)
 
 * [x] Leitura de hardware via Polling (Zero lag).
 * [x] Injeção de estado contínuo (Cliques e Scroll).
