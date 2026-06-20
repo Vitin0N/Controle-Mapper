@@ -4,6 +4,7 @@
 #include "controller/Controller_Map.h"
 #include "mouse/Mouse.h"
 #include "keyboard/Keyboard.h"
+#include "keyboard/AtalhoTeclasMapper.h"
 
 
 // Importa o windows.h caso estejamos em sistemas windows
@@ -46,14 +47,11 @@ int main(int argc, char* argv[]) {
     std::cout << "\nLendo o controle 1. Precione START + B para encerrar o programa\n";
 
     // Define os triggers como não clicados ainda
-    bool lt_pressionado = false;
-    bool rt_pressionado = false;
+    bool LT_pressionado = false;
+    bool RT_pressionado = false;
 
     // Define se botões padrão estão apertados
-    bool botao_UP_apertado = false;
-    bool botao_DOWN_apertado = false;
-    bool botao_LEFT_apertado = false;
-    bool botao_RIGHT_apertado = false;
+    bool RB_pressionado = false;
 
     // Roda até o usuário pedir para parar
     while(rodando){
@@ -66,6 +64,9 @@ int main(int argc, char* argv[]) {
         // Recebe os eventos de entrada dos dispositivos conectados
         meuControle.atualizarEventos();
 
+        // ========================
+        // Encerramento do programa
+        // ========================
 
         // START + B programa encerra
         if(meuControle.isBotaoPressionado(ControllerMap::START) &&
@@ -73,8 +74,27 @@ int main(int argc, char* argv[]) {
         ) {
             rodando = false;
         }
+        // =================
+        // Funções de atalho
+        // =================
 
+        // RB -> ALT + TAB
+        if(meuControle.isBotaoPressionado(ControllerMap::RB) && 
+            !RB_pressionado)
+        {
+            meuTeclado.apertaAtalho(AtalhoMap::ALT_TAB);
+            RB_pressionado = true;
+        } else if (!meuControle.isBotaoPressionado(ControllerMap::RB) && 
+                    RB_pressionado)
+        {
+            RB_pressionado = false;
+        }
+
+        // ================
         // Função de mouse
+        // =================
+
+        // Pega as coordenadas da alavanca esquerda
         int eixoLX = meuControle.getEixos(ControllerMap::LEFT_X);
         int eixoLY = meuControle.getEixos(ControllerMap::LEFT_Y);
 
@@ -95,6 +115,7 @@ int main(int argc, char* argv[]) {
             meuMouse.mover(velocidadeLX, velocidadeLY);
         }
 
+        // Pega as coordenadas da alavanca direita
         int eixoRX = meuControle.getEixos(ControllerMap::RIGHT_X);
         int eixoRY = meuControle.getEixos(ControllerMap::RIGHT_Y);
 
@@ -106,7 +127,7 @@ int main(int argc, char* argv[]) {
         }
 
         if(abs(eixoRX) > ZONA_MORTA){
-            scrollY = (eixoRX / VELOCIDADE_SCROLL);
+            scrollX = (eixoRX / VELOCIDADE_SCROLL);
         }
 
         if(scrollX != 0 || scrollY != 0){
@@ -118,24 +139,28 @@ int main(int argc, char* argv[]) {
         bool deveClicarRT = meuControle.getEixos(ControllerMap::RT) > 1600;
 
         // Verifica se o LT esta pressionado para executar o clique no botão esquerdo do mouse
-        if(deveClicarLT && !lt_pressionado){
+        if(deveClicarLT && !LT_pressionado){
             meuMouse.cliqueEsquerdo(true);
-            lt_pressionado = true;
-        } else if(!deveClicarLT && lt_pressionado){
+            LT_pressionado = true;
+        } else if(!deveClicarLT && LT_pressionado){
             meuMouse.cliqueEsquerdo(false);
-            lt_pressionado = false;
+            LT_pressionado = false;
         }
 
         // Verifica se o RT esta pressionado para executar o clique no botão direito do mouse
-        if(deveClicarRT && !rt_pressionado){
+        if(deveClicarRT && !RT_pressionado){
             meuMouse.cliqueDireito(true);
-            rt_pressionado = true;
-        } else if(!deveClicarRT && rt_pressionado){
+            RT_pressionado = true;
+        } else if(!deveClicarRT && RT_pressionado){
             meuMouse.cliqueDireito(false);
-            rt_pressionado = false;
+            RT_pressionado = false;
         }
 
+        // ==================
         // Funções de teclado
+        // ==================
+
+        // Verifica se as setinhas do teclados estão sendo pressionadas
         bool botaoUP = meuControle.isBotaoPressionado(ControllerMap::DPAD_UP);
         bool botaoDOWN = meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN);
         bool botaoLEFT = meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT);

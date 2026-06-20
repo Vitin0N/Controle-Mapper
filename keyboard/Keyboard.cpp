@@ -19,3 +19,17 @@ void Keyboard::apertaTecla(int vkCode, bool pressionada){
         SendInput(1, &input, sizeof(INPUT));
     #endif
 }
+
+void Keyboard::apertaAtalho(const Atalho& atalho){
+    #ifdef _WIN32
+        // Pressiona todas as teclas
+        for(int i = 0; i < atalho.tamanho; i++){
+            apertaTecla(atalho.teclas[i], true);
+        }
+
+        // Depois solta todas as teclas
+        for(int i = atalho.tamanho; i > 0; i--){
+            apertaTecla(atalho.teclas[i], false);
+        }
+    #endif
+}
