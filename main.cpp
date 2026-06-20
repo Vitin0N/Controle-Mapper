@@ -53,6 +53,10 @@ int main(int argc, char* argv[]) {
     // Define se botões padrão estão apertados
     bool RB_pressionado = false;
 
+    // Define se as teclas estão sendo seguradas
+    bool ALT_pressionado = false;
+
+
     // Roda até o usuário pedir para parar
     while(rodando){
 
@@ -74,38 +78,23 @@ int main(int argc, char* argv[]) {
         ) {
             rodando = false;
         }
-        // =================
-        // Funções de atalho
-        // =================
-
-        // RB -> ALT + TAB
-        if(meuControle.isBotaoPressionado(ControllerMap::RB) && 
-            !RB_pressionado)
-        {
-            meuTeclado.apertaAtalho(AtalhoMap::ALT_TAB);
-            RB_pressionado = true;
-        } else if (!meuControle.isBotaoPressionado(ControllerMap::RB) && 
-                    RB_pressionado)
-        {
-            RB_pressionado = false;
-        }
-
+        
         // ================
         // Função de mouse
         // =================
-
+        
         // Pega as coordenadas da alavanca esquerda
         int eixoLX = meuControle.getEixos(ControllerMap::LEFT_X);
         int eixoLY = meuControle.getEixos(ControllerMap::LEFT_Y);
-
+        
         int velocidadeLX = 0;
         int velocidadeLY = 0;
-
+        
         // Verifica a velocidade de movimento do mouse
         if(abs(eixoLX) > ZONA_MORTA){
             velocidadeLX = (eixoLX / 2000);
         }
-
+        
         if(abs(eixoLY) > ZONA_MORTA){
             velocidadeLY = (eixoLY / 2000);
         }
@@ -118,26 +107,26 @@ int main(int argc, char* argv[]) {
         // Pega as coordenadas da alavanca direita
         int eixoRX = meuControle.getEixos(ControllerMap::RIGHT_X);
         int eixoRY = meuControle.getEixos(ControllerMap::RIGHT_Y);
-
+        
         int scrollX = 0;
         int scrollY = 0;
-
+        
         if(abs(eixoRY) > ZONA_MORTA){
             scrollY = (eixoRY / VELOCIDADE_SCROLL) * -1; // Deixa invertido
         }
-
+        
         if(abs(eixoRX) > ZONA_MORTA){
             scrollX = (eixoRX / VELOCIDADE_SCROLL);
         }
-
+        
         if(scrollX != 0 || scrollY != 0){
             meuMouse.scroll(scrollX, scrollY);
         }
-
+        
         // Verifica se os gatilhos forma precionado mais da metade
         bool deveClicarLT = meuControle.getEixos(ControllerMap::LT) > 1600;
         bool deveClicarRT = meuControle.getEixos(ControllerMap::RT) > 1600;
-
+        
         // Verifica se o LT esta pressionado para executar o clique no botão esquerdo do mouse
         if(deveClicarLT && !LT_pressionado){
             meuMouse.cliqueEsquerdo(true);
@@ -146,7 +135,7 @@ int main(int argc, char* argv[]) {
             meuMouse.cliqueEsquerdo(false);
             LT_pressionado = false;
         }
-
+        
         // Verifica se o RT esta pressionado para executar o clique no botão direito do mouse
         if(deveClicarRT && !RT_pressionado){
             meuMouse.cliqueDireito(true);
@@ -155,48 +144,84 @@ int main(int argc, char* argv[]) {
             meuMouse.cliqueDireito(false);
             RT_pressionado = false;
         }
-
+        
         // ==================
         // Funções de teclado
         // ==================
-
+        
         // Verifica se as setinhas do teclados estão sendo pressionadas
         bool botaoUP = meuControle.isBotaoPressionado(ControllerMap::DPAD_UP);
         bool botaoDOWN = meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN);
         bool botaoLEFT = meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT);
         bool botaoRIGHT = meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT);
-
+        
         // Botão UP pressionada pela setinha do controle
         if(botaoUP){
             meuTeclado.apertaTecla(VK_UP, true);
         } else {
             meuTeclado.apertaTecla(VK_UP, false);
         }
-
+        
         // Botão DOWN pressionada pela setinha do controle
         if(botaoDOWN){
             meuTeclado.apertaTecla(VK_DOWN, true);
         } else {
             meuTeclado.apertaTecla(VK_DOWN, false);
         }
-
+        
         // Botão LEFT pressionada pela setinha do controle
         if(botaoLEFT){
             meuTeclado.apertaTecla(VK_LEFT, true);
         } else {
             meuTeclado.apertaTecla(VK_LEFT, false);
         }
-
+        
         // Botão RIGHT pressionada pela setinha do controle
         if(botaoRIGHT){
             meuTeclado.apertaTecla(VK_RIGHT, true);
         } else {
             meuTeclado.apertaTecla(VK_RIGHT, false);
         }
+        
+        // =================
+        // Funções de atalho
+        // =================
+        
+        // RB -> ALT + TAB (ativar)
+        if(meuControle.isBotaoPressionado(ControllerMap::RB) && 
+            !RB_pressionado && !ALT_pressionado)
+        {
+            meuTeclado.apertaAltTab();
+            ALT_pressionado = true;
+            RB_pressionado = true;
 
-        SDL_Delay(50); // Espera 50ms antes de ler uma nova entrada
+            
+            // Bloqueia as outras funções até ele sair do ALT + TAB
+            while(ALT_pressionado){
+                // Pega os botões no estado atual
+                bool botaoA = meuControle.isBotaoPressionado(ControllerMap::BTN_A);
+                bool botaoB = meuControle.isBotaoPressionado(ControllerMap::BTN_B);
+                
+                // Busca os inputs do controle
+                meuControle.atualizarEventos();
+
+                // Caso ele confirme ou saia do ALT + TAB então o while é encerrado.
+                if(botaoA || botaoB) {
+                        ALT_pressionado = false;
+                }
+
+                SDL_Delay(30);
+            }
+
+            RB_pressionado = false;
+            meuTeclado.soltaAltTab();
+
+        } 
+        
+
+        SDL_Delay(30); // Espera 50ms antes de ler uma nova entrada
     }
-
+    
     // Libera o controle
     meuControle.desconectar();
     // Fecha o SDL corretamente antes de sair

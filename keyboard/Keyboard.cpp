@@ -1,4 +1,5 @@
 #include "Keyboard.h"
+#include "AtalhoTeclasMapper.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -31,5 +32,23 @@ void Keyboard::apertaAtalho(const Atalho& atalho){
         for(int i = atalho.tamanho - 1; i >= 0; i--){
             apertaTecla(atalho.teclas[i], false);
         }
+    #endif
+}
+
+void Keyboard::apertaAltTab(){
+    #ifdef _WIN32
+        // Pressiona ALT + TAB
+        apertaTecla(VK_MENU, true);
+        apertaTecla(VK_TAB, true);
+
+        // Libera apenas o TAB
+        apertaTecla(VK_TAB, false);
+    #endif
+}
+
+void Keyboard::soltaAltTab(){
+    #ifdef _WIN32
+        // Solta o ALT 
+        apertaTecla(VK_MENU, false);
     #endif
 }
