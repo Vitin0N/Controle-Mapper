@@ -28,7 +28,7 @@ void Keyboard::apertaAtalho(const Atalho& atalho){
         }
 
         // Depois solta todas as teclas
-        for(int i = atalho.tamanho; i > 0; i--){
+        for(int i = atalho.tamanho - 1; i >= 0; i--){
             apertaTecla(atalho.teclas[i], false);
         }
     #endif
