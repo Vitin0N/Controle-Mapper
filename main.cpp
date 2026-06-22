@@ -1,10 +1,12 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+
 #include "controller/Controller.h"
 #include "controller/Controller_Map.h"
 #include "mouse/Mouse.h"
 #include "keyboard/Keyboard.h"
 #include "keyboard/AtalhoTeclasMapper.h"
+#include "keyboard/VirtualKeyboard.h"
 
 
 // Importa o windows.h caso estejamos em sistemas windows
@@ -34,6 +36,7 @@ int main(int argc, char* argv[]) {
 
     // Criando um teclado virtual
     Keyboard meuTeclado;
+    VirtualKeyboard meuTecladoVirtual;
     
     // Verifica se há algum conectado
     if(!meuControle.conectar()){
@@ -158,6 +161,8 @@ int main(int argc, char* argv[]) {
         // Botão UP pressionada pela setinha do controle
         if(botaoUP){
             meuTeclado.apertaTecla(VK_UP, true);
+            meuTecladoVirtual.moverCima();
+            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
         } else {
             meuTeclado.apertaTecla(VK_UP, false);
         }
@@ -165,6 +170,8 @@ int main(int argc, char* argv[]) {
         // Botão DOWN pressionada pela setinha do controle
         if(botaoDOWN){
             meuTeclado.apertaTecla(VK_DOWN, true);
+            meuTecladoVirtual.moverBaixo();
+            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
         } else {
             meuTeclado.apertaTecla(VK_DOWN, false);
         }
@@ -172,6 +179,8 @@ int main(int argc, char* argv[]) {
         // Botão LEFT pressionada pela setinha do controle
         if(botaoLEFT){
             meuTeclado.apertaTecla(VK_LEFT, true);
+            meuTecladoVirtual.moverEsquerda();
+            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
         } else {
             meuTeclado.apertaTecla(VK_LEFT, false);
         }
@@ -179,6 +188,8 @@ int main(int argc, char* argv[]) {
         // Botão RIGHT pressionada pela setinha do controle
         if(botaoRIGHT){
             meuTeclado.apertaTecla(VK_RIGHT, true);
+            meuTecladoVirtual.moverDireita();
+            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
         } else {
             meuTeclado.apertaTecla(VK_RIGHT, false);
         }
