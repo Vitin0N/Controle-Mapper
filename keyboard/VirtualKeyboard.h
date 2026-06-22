@@ -1,4 +1,5 @@
 #pragma once
+#include <SDL2/SDL.h>
 
 class VirtualKeyboard{
 
@@ -26,4 +27,7 @@ class VirtualKeyboard{
 
     // Função que sabe a tecla atual
     char getTeclaAtual();
+
+    // Desenha o teclado na tela
+    void desenhaTeclado(SDL_Renderer *render);
 };

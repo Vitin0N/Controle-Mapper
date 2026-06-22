@@ -22,6 +22,9 @@
 
 int main(int argc, char* argv[]) {
 
+    // Força o SDL a escutar o controle mesmo com a janela escondida ou sem foco
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
     // Tenta inicializar o subsistema de controle do SDL
     if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_VIDEO) != 0) {
         std::cerr << "Erro ao inicializar o SDL: " << SDL_GetError() << std::endl;
@@ -37,6 +40,16 @@ int main(int argc, char* argv[]) {
     // Criando um teclado virtual
     Keyboard meuTeclado;
     VirtualKeyboard meuTecladoVirtual;
+
+    // Cria a tela do teclado virtual
+    SDL_Window *janelaTeclado = SDL_CreateWindow(
+        "Teclado Virtual (Aperte SELECT pra sair)",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        710, 290, 
+        SDL_WINDOW_HIDDEN
+    );
+
+    SDL_Renderer *renderizador = SDL_CreateRenderer(janelaTeclado, -1, SDL_RENDERER_ACCELERATED);
 
     // Criando estados possiveis do programa
     enum ModoPrograma {
@@ -79,39 +92,43 @@ int main(int argc, char* argv[]) {
 
         SDL_Event lixo;
         while(SDL_PollEvent(&lixo)){
+            if(lixo.type == SDL_QUIT){
+                rodando = false;
+            }
             // Tirar os itens antigos da fila para não travar
         }
         
         // Recebe os eventos de entrada dos dispositivos conectados
         meuControle.atualizarEventos();
-
-        // Lógica de mudança de estado do programa
-        bool botaoBack = meuControle.isBotaoPressionado(ControllerMap::BACK);
-
-        if(!BACK_pressionado && botaoBack){
-            if(modoAtual == MODO_NORMAL){
-                modoAtual = MODO_TECLADO_VIRTUAL;
-                std::cout << "\n--- MODO TECLADO ATIVADO ---\n";
-            } else {
-                modoAtual = MODO_NORMAL;
-                std::cout << "\n--- MODO NORMAL ATIVADO ---\n";
-            }
-            BACK_pressionado = true;
-        } else if(BACK_pressionado && !botaoBack){
-            BACK_pressionado = false;
-        }
-
+        
         // ========================
         // Encerramento do programa
         // ========================
-
+        
         // START + B programa encerra
         if(meuControle.isBotaoPressionado(ControllerMap::START) &&
-            meuControle.isBotaoPressionado(ControllerMap::BTN_B)
-        ) {
-            rodando = false;
-        }
+        meuControle.isBotaoPressionado(ControllerMap::BTN_B)
+    ) {
+        rodando = false;
+    }
 
+    // Lógica de mudança de estado do programa
+    bool botaoBack = meuControle.isBotaoPressionado(ControllerMap::BACK);
+    if(!BACK_pressionado && botaoBack){
+        if(modoAtual == MODO_NORMAL){
+            modoAtual = MODO_TECLADO_VIRTUAL;
+            SDL_ShowWindow(janelaTeclado);
+            std::cout << "\n--- MODO TECLADO ATIVADO ---\n";
+        } else {
+            modoAtual = MODO_NORMAL;
+            SDL_HideWindow(janelaTeclado);
+            std::cout << "\n--- MODO NORMAL ATIVADO ---\n";
+        }
+        BACK_pressionado = true;
+    } else if(BACK_pressionado && !botaoBack){
+        BACK_pressionado = false;
+    }
+    
         // Verifica modo de programa
         if(modoAtual == MODO_NORMAL){
             // ================
@@ -193,7 +210,6 @@ int main(int argc, char* argv[]) {
             // Botão UP pressionada pela setinha do controle
             if(botaoUP){
                 meuTeclado.apertaTecla(VK_UP, true);
-                meuTecladoVirtual.moverCima();
                 std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_UP, false);
@@ -202,7 +218,6 @@ int main(int argc, char* argv[]) {
             // Botão DOWN pressionada pela setinha do controle
             if(botaoDOWN){
                 meuTeclado.apertaTecla(VK_DOWN, true);
-                meuTecladoVirtual.moverBaixo();
                 std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_DOWN, false);
@@ -211,7 +226,6 @@ int main(int argc, char* argv[]) {
             // Botão LEFT pressionada pela setinha do controle
             if(botaoLEFT){
                 meuTeclado.apertaTecla(VK_LEFT, true);
-                meuTecladoVirtual.moverEsquerda();
                 std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_LEFT, false);
@@ -220,7 +234,6 @@ int main(int argc, char* argv[]) {
             // Botão RIGHT pressionada pela setinha do controle
             if(botaoRIGHT){
                 meuTeclado.apertaTecla(VK_RIGHT, true);
-                meuTecladoVirtual.moverDireita();
                 std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_RIGHT, false);
@@ -305,6 +318,8 @@ int main(int argc, char* argv[]) {
             } else if(A_pressionado && !botaoA){
                 A_pressionado = false;
             }
+
+            meuTecladoVirtual.desenhaTeclado(renderizador);
         }
 
         SDL_Delay(30); // Espera 50ms antes de ler uma nova entrada
@@ -313,6 +328,8 @@ int main(int argc, char* argv[]) {
     // Libera o controle
     meuControle.desconectar();
     // Fecha o SDL corretamente antes de sair
+    SDL_DestroyRenderer(renderizador);
+    SDL_DestroyWindow(janelaTeclado);
     SDL_Quit();
     return 0;
 }
