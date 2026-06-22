@@ -37,6 +37,14 @@ int main(int argc, char* argv[]) {
     // Criando um teclado virtual
     Keyboard meuTeclado;
     VirtualKeyboard meuTecladoVirtual;
+
+    // Criando estados possiveis do programa
+    enum ModoPrograma {
+        MODO_NORMAL,
+        MODO_TECLADO_VIRTUAL
+    };
+
+    ModoPrograma modoAtual = MODO_NORMAL;
     
     // Verifica se há algum conectado
     if(!meuControle.conectar()){
@@ -55,6 +63,12 @@ int main(int argc, char* argv[]) {
 
     // Define se botões padrão estão apertados
     bool RB_pressionado = false;
+    bool BACK_pressionado = false;
+    bool A_pressionado = false;
+    bool UP_pressionado = false;
+    bool DOWN_pressionado = false;
+    bool LEFT_pressionado = false;
+    bool RIGHT_pressionado = false;
 
     // Define se as teclas estão sendo seguradas
     bool ALT_pressionado = false;
@@ -67,9 +81,25 @@ int main(int argc, char* argv[]) {
         while(SDL_PollEvent(&lixo)){
             // Tirar os itens antigos da fila para não travar
         }
-
+        
         // Recebe os eventos de entrada dos dispositivos conectados
         meuControle.atualizarEventos();
+
+        // Lógica de mudança de estado do programa
+        bool botaoBack = meuControle.isBotaoPressionado(ControllerMap::BACK);
+
+        if(!BACK_pressionado && botaoBack){
+            if(modoAtual == MODO_NORMAL){
+                modoAtual = MODO_TECLADO_VIRTUAL;
+                std::cout << "\n--- MODO TECLADO ATIVADO ---\n";
+            } else {
+                modoAtual = MODO_NORMAL;
+                std::cout << "\n--- MODO NORMAL ATIVADO ---\n";
+            }
+            BACK_pressionado = true;
+        } else if(BACK_pressionado && !botaoBack){
+            BACK_pressionado = false;
+        }
 
         // ========================
         // Encerramento do programa
@@ -81,154 +111,201 @@ int main(int argc, char* argv[]) {
         ) {
             rodando = false;
         }
-        
-        // ================
-        // Função de mouse
-        // =================
-        
-        // Pega as coordenadas da alavanca esquerda
-        int eixoLX = meuControle.getEixos(ControllerMap::LEFT_X);
-        int eixoLY = meuControle.getEixos(ControllerMap::LEFT_Y);
-        
-        int velocidadeLX = 0;
-        int velocidadeLY = 0;
-        
-        // Verifica a velocidade de movimento do mouse
-        if(abs(eixoLX) > ZONA_MORTA){
-            velocidadeLX = (eixoLX / 2000);
-        }
-        
-        if(abs(eixoLY) > ZONA_MORTA){
-            velocidadeLY = (eixoLY / 2000);
-        }
 
-        // Caso exista alguma velocidade então o mouse é movido
-        if(velocidadeLX != 0 || velocidadeLY != 0){
-            meuMouse.mover(velocidadeLX, velocidadeLY);
-        }
-
-        // Pega as coordenadas da alavanca direita
-        int eixoRX = meuControle.getEixos(ControllerMap::RIGHT_X);
-        int eixoRY = meuControle.getEixos(ControllerMap::RIGHT_Y);
-        
-        int scrollX = 0;
-        int scrollY = 0;
-        
-        if(abs(eixoRY) > ZONA_MORTA){
-            scrollY = (eixoRY / VELOCIDADE_SCROLL) * -1; // Deixa invertido
-        }
-        
-        if(abs(eixoRX) > ZONA_MORTA){
-            scrollX = (eixoRX / VELOCIDADE_SCROLL);
-        }
-        
-        if(scrollX != 0 || scrollY != 0){
-            meuMouse.scroll(scrollX, scrollY);
-        }
-        
-        // Verifica se os gatilhos forma precionado mais da metade
-        bool deveClicarLT = meuControle.getEixos(ControllerMap::LT) > 1600;
-        bool deveClicarRT = meuControle.getEixos(ControllerMap::RT) > 1600;
-        
-        // Verifica se o LT esta pressionado para executar o clique no botão esquerdo do mouse
-        if(deveClicarLT && !LT_pressionado){
-            meuMouse.cliqueEsquerdo(true);
-            LT_pressionado = true;
-        } else if(!deveClicarLT && LT_pressionado){
-            meuMouse.cliqueEsquerdo(false);
-            LT_pressionado = false;
-        }
-        
-        // Verifica se o RT esta pressionado para executar o clique no botão direito do mouse
-        if(deveClicarRT && !RT_pressionado){
-            meuMouse.cliqueDireito(true);
-            RT_pressionado = true;
-        } else if(!deveClicarRT && RT_pressionado){
-            meuMouse.cliqueDireito(false);
-            RT_pressionado = false;
-        }
-        
-        // ==================
-        // Funções de teclado
-        // ==================
-        
-        // Verifica se as setinhas do teclados estão sendo pressionadas
-        bool botaoUP = meuControle.isBotaoPressionado(ControllerMap::DPAD_UP);
-        bool botaoDOWN = meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN);
-        bool botaoLEFT = meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT);
-        bool botaoRIGHT = meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT);
-        
-        // Botão UP pressionada pela setinha do controle
-        if(botaoUP){
-            meuTeclado.apertaTecla(VK_UP, true);
-            meuTecladoVirtual.moverCima();
-            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
-        } else {
-            meuTeclado.apertaTecla(VK_UP, false);
-        }
-        
-        // Botão DOWN pressionada pela setinha do controle
-        if(botaoDOWN){
-            meuTeclado.apertaTecla(VK_DOWN, true);
-            meuTecladoVirtual.moverBaixo();
-            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
-        } else {
-            meuTeclado.apertaTecla(VK_DOWN, false);
-        }
-        
-        // Botão LEFT pressionada pela setinha do controle
-        if(botaoLEFT){
-            meuTeclado.apertaTecla(VK_LEFT, true);
-            meuTecladoVirtual.moverEsquerda();
-            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
-        } else {
-            meuTeclado.apertaTecla(VK_LEFT, false);
-        }
-        
-        // Botão RIGHT pressionada pela setinha do controle
-        if(botaoRIGHT){
-            meuTeclado.apertaTecla(VK_RIGHT, true);
-            meuTecladoVirtual.moverDireita();
-            std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
-        } else {
-            meuTeclado.apertaTecla(VK_RIGHT, false);
-        }
-        
-        // =================
-        // Funções de atalho
-        // =================
-        
-        // RB -> ALT + TAB (ativar)
-        if(meuControle.isBotaoPressionado(ControllerMap::RB) && 
-            !RB_pressionado && !ALT_pressionado)
-        {
-            meuTeclado.apertaAltTab();
-            ALT_pressionado = true;
-            RB_pressionado = true;
-
+        // Verifica modo de programa
+        if(modoAtual == MODO_NORMAL){
+            // ================
+            // Função de mouse
+            // =================
             
-            // Bloqueia as outras funções até ele sair do ALT + TAB
-            while(ALT_pressionado){
-                // Pega os botões no estado atual
-                bool botaoA = meuControle.isBotaoPressionado(ControllerMap::BTN_A);
-                bool botaoB = meuControle.isBotaoPressionado(ControllerMap::BTN_B);
-                
-                // Busca os inputs do controle
-                meuControle.atualizarEventos();
-
-                // Caso ele confirme ou saia do ALT + TAB então o while é encerrado.
-                if(botaoA || botaoB) {
-                        ALT_pressionado = false;
-                }
-
-                SDL_Delay(30);
+            // Pega as coordenadas da alavanca esquerda
+            int eixoLX = meuControle.getEixos(ControllerMap::LEFT_X);
+            int eixoLY = meuControle.getEixos(ControllerMap::LEFT_Y);
+            
+            int velocidadeLX = 0;
+            int velocidadeLY = 0;
+            
+            // Verifica a velocidade de movimento do mouse
+            if(abs(eixoLX) > ZONA_MORTA){
+                velocidadeLX = (eixoLX / 2000);
+            }
+            
+            if(abs(eixoLY) > ZONA_MORTA){
+                velocidadeLY = (eixoLY / 2000);
             }
 
-            RB_pressionado = false;
-            meuTeclado.soltaAltTab();
+            // Caso exista alguma velocidade então o mouse é movido
+            if(velocidadeLX != 0 || velocidadeLY != 0){
+                meuMouse.mover(velocidadeLX, velocidadeLY);
+            }
 
-        } 
-        
+            // Pega as coordenadas da alavanca direita
+            int eixoRX = meuControle.getEixos(ControllerMap::RIGHT_X);
+            int eixoRY = meuControle.getEixos(ControllerMap::RIGHT_Y);
+            
+            int scrollX = 0;
+            int scrollY = 0;
+            
+            if(abs(eixoRY) > ZONA_MORTA){
+                scrollY = (eixoRY / VELOCIDADE_SCROLL) * -1; // Deixa invertido
+            }
+            
+            if(abs(eixoRX) > ZONA_MORTA){
+                scrollX = (eixoRX / VELOCIDADE_SCROLL);
+            }
+            
+            if(scrollX != 0 || scrollY != 0){
+                meuMouse.scroll(scrollX, scrollY);
+            }
+            
+            // Verifica se os gatilhos forma precionado mais da metade
+            bool deveClicarLT = meuControle.getEixos(ControllerMap::LT) > 1600;
+            bool deveClicarRT = meuControle.getEixos(ControllerMap::RT) > 1600;
+            
+            // Verifica se o LT esta pressionado para executar o clique no botão esquerdo do mouse
+            if(deveClicarLT && !LT_pressionado){
+                meuMouse.cliqueEsquerdo(true);
+                LT_pressionado = true;
+            } else if(!deveClicarLT && LT_pressionado){
+                meuMouse.cliqueEsquerdo(false);
+                LT_pressionado = false;
+            }
+            
+            // Verifica se o RT esta pressionado para executar o clique no botão direito do mouse
+            if(deveClicarRT && !RT_pressionado){
+                meuMouse.cliqueDireito(true);
+                RT_pressionado = true;
+            } else if(!deveClicarRT && RT_pressionado){
+                meuMouse.cliqueDireito(false);
+                RT_pressionado = false;
+            }
+            
+            // ==================
+            // Funções de teclado
+            // ==================
+            
+            // Verifica se as setinhas do teclados estão sendo pressionadas
+            bool botaoUP = meuControle.isBotaoPressionado(ControllerMap::DPAD_UP);
+            bool botaoDOWN = meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN);
+            bool botaoLEFT = meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT);
+            bool botaoRIGHT = meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT);
+            
+            // Botão UP pressionada pela setinha do controle
+            if(botaoUP){
+                meuTeclado.apertaTecla(VK_UP, true);
+                meuTecladoVirtual.moverCima();
+                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
+            } else {
+                meuTeclado.apertaTecla(VK_UP, false);
+            }
+            
+            // Botão DOWN pressionada pela setinha do controle
+            if(botaoDOWN){
+                meuTeclado.apertaTecla(VK_DOWN, true);
+                meuTecladoVirtual.moverBaixo();
+                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
+            } else {
+                meuTeclado.apertaTecla(VK_DOWN, false);
+            }
+            
+            // Botão LEFT pressionada pela setinha do controle
+            if(botaoLEFT){
+                meuTeclado.apertaTecla(VK_LEFT, true);
+                meuTecladoVirtual.moverEsquerda();
+                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
+            } else {
+                meuTeclado.apertaTecla(VK_LEFT, false);
+            }
+            
+            // Botão RIGHT pressionada pela setinha do controle
+            if(botaoRIGHT){
+                meuTeclado.apertaTecla(VK_RIGHT, true);
+                meuTecladoVirtual.moverDireita();
+                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
+            } else {
+                meuTeclado.apertaTecla(VK_RIGHT, false);
+            }
+            
+            // =================
+            // Funções de atalho
+            // =================
+            
+            // RB -> ALT + TAB (ativar)
+            if(meuControle.isBotaoPressionado(ControllerMap::RB) && 
+                !RB_pressionado && !ALT_pressionado)
+            {
+                meuTeclado.apertaAltTab();
+                ALT_pressionado = true;
+                RB_pressionado = true;
+
+                
+                // Bloqueia as outras funções até ele sair do ALT + TAB
+                while(ALT_pressionado){
+                    // Pega os botões no estado atual
+                    bool botaoA = meuControle.isBotaoPressionado(ControllerMap::BTN_A);
+                    bool botaoB = meuControle.isBotaoPressionado(ControllerMap::BTN_B);
+                    
+                    // Busca os inputs do controle
+                    meuControle.atualizarEventos();
+
+                    // Caso ele confirme ou saia do ALT + TAB então o while é encerrado.
+                    if(botaoA || botaoB) {
+                            ALT_pressionado = false;
+                    }
+
+                    SDL_Delay(30);
+                }
+
+                RB_pressionado = false;
+                meuTeclado.soltaAltTab();
+
+            } 
+        } else if(modoAtual == MODO_TECLADO_VIRTUAL){
+            // ==========================
+            // Funções de Teclado Virtual
+            // ==========================
+
+            // Move para cima
+            if(!UP_pressionado && meuControle.isBotaoPressionado(ControllerMap::DPAD_UP)){
+                meuTecladoVirtual.moverCima();
+                UP_pressionado = true;
+            }else if(UP_pressionado && !meuControle.isBotaoPressionado(ControllerMap::DPAD_UP)){
+                UP_pressionado = false;
+            }
+            
+            // Move para baixo
+            if(!DOWN_pressionado && meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN)){
+                meuTecladoVirtual.moverBaixo();
+                DOWN_pressionado = true;
+            }else if(DOWN_pressionado && !meuControle.isBotaoPressionado(ControllerMap::DPAD_DOWN)){
+                DOWN_pressionado = false;
+            }
+            
+            // Move para esquerda
+            if(!LEFT_pressionado && meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT)){
+                meuTecladoVirtual.moverEsquerda();
+                LEFT_pressionado = true;
+            }else if(LEFT_pressionado && !meuControle.isBotaoPressionado(ControllerMap::DPAD_LEFT)){
+                LEFT_pressionado = false;
+            }
+            
+            // Move para direita
+            if(!RIGHT_pressionado && meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT)){
+                meuTecladoVirtual.moverDireita();
+                RIGHT_pressionado = true;
+            }else if(RIGHT_pressionado && !meuControle.isBotaoPressionado(ControllerMap::DPAD_RIGHT)){
+                RIGHT_pressionado = false;
+            }
+
+            // Confirmou a tecla pressionada
+            bool botaoA = meuControle.isBotaoPressionado(ControllerMap::BTN_A);
+            if(!A_pressionado && botaoA){
+                std::cout << meuTecladoVirtual.getTeclaAtual();
+                A_pressionado = true;
+            } else if(A_pressionado && !botaoA){
+                A_pressionado = false;
+            }
+        }
 
         SDL_Delay(30); // Espera 50ms antes de ler uma nova entrada
     }
