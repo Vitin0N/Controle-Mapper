@@ -39,13 +39,13 @@ int main(int argc, char* argv[]) {
 
     // Criando um teclado virtual
     Keyboard meuTeclado;
-    VirtualKeyboard meuTecladoVirtual;
+    VirtualKeyboard meuTecladoVirtual(1040, 360);
 
     // Cria a tela do teclado virtual
     SDL_Window *janelaTeclado = SDL_CreateWindow(
         "Teclado Virtual (Aperte SELECT pra sair)",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        710, 290, 
+        1040, 360, 
         SDL_WINDOW_HIDDEN
     );
 
@@ -108,26 +108,26 @@ int main(int argc, char* argv[]) {
         // START + B programa encerra
         if(meuControle.isBotaoPressionado(ControllerMap::START) &&
         meuControle.isBotaoPressionado(ControllerMap::BTN_B)
-    ) {
-        rodando = false;
-    }
-
-    // Lógica de mudança de estado do programa
-    bool botaoBack = meuControle.isBotaoPressionado(ControllerMap::BACK);
-    if(!BACK_pressionado && botaoBack){
-        if(modoAtual == MODO_NORMAL){
-            modoAtual = MODO_TECLADO_VIRTUAL;
-            SDL_ShowWindow(janelaTeclado);
-            std::cout << "\n--- MODO TECLADO ATIVADO ---\n";
-        } else {
-            modoAtual = MODO_NORMAL;
-            SDL_HideWindow(janelaTeclado);
-            std::cout << "\n--- MODO NORMAL ATIVADO ---\n";
+        ) {
+            rodando = false;
         }
-        BACK_pressionado = true;
-    } else if(BACK_pressionado && !botaoBack){
-        BACK_pressionado = false;
-    }
+
+        // Lógica de mudança de estado do programa
+        bool botaoBack = meuControle.isBotaoPressionado(ControllerMap::BACK);
+        if(!BACK_pressionado && botaoBack){
+            if(modoAtual == MODO_NORMAL){
+                modoAtual = MODO_TECLADO_VIRTUAL;
+                SDL_ShowWindow(janelaTeclado);
+                std::cout << "\n--- MODO TECLADO ATIVADO ---\n";
+            } else {
+                modoAtual = MODO_NORMAL;
+                SDL_HideWindow(janelaTeclado);
+                std::cout << "\n--- MODO NORMAL ATIVADO ---\n";
+            }
+            BACK_pressionado = true;
+        } else if(BACK_pressionado && !botaoBack){
+            BACK_pressionado = false;
+        }
     
         // Verifica modo de programa
         if(modoAtual == MODO_NORMAL){
@@ -210,7 +210,6 @@ int main(int argc, char* argv[]) {
             // Botão UP pressionada pela setinha do controle
             if(botaoUP){
                 meuTeclado.apertaTecla(VK_UP, true);
-                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_UP, false);
             }
@@ -218,7 +217,6 @@ int main(int argc, char* argv[]) {
             // Botão DOWN pressionada pela setinha do controle
             if(botaoDOWN){
                 meuTeclado.apertaTecla(VK_DOWN, true);
-                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_DOWN, false);
             }
@@ -226,7 +224,6 @@ int main(int argc, char* argv[]) {
             // Botão LEFT pressionada pela setinha do controle
             if(botaoLEFT){
                 meuTeclado.apertaTecla(VK_LEFT, true);
-                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_LEFT, false);
             }
@@ -234,7 +231,6 @@ int main(int argc, char* argv[]) {
             // Botão RIGHT pressionada pela setinha do controle
             if(botaoRIGHT){
                 meuTeclado.apertaTecla(VK_RIGHT, true);
-                std::cout << "Tecla Atual: " << meuTecladoVirtual.getTeclaAtual() << "\n";
             } else {
                 meuTeclado.apertaTecla(VK_RIGHT, false);
             }
@@ -313,7 +309,6 @@ int main(int argc, char* argv[]) {
             // Confirmou a tecla pressionada
             bool botaoA = meuControle.isBotaoPressionado(ControllerMap::BTN_A);
             if(!A_pressionado && botaoA){
-                std::cout << meuTecladoVirtual.getTeclaAtual();
                 A_pressionado = true;
             } else if(A_pressionado && !botaoA){
                 A_pressionado = false;

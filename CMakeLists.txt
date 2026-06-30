@@ -1,31 +1,64 @@
 cmake_minimum_required(VERSION 3.14)
 project(ControleMapper)
 
+# Compila com UTF8
+add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
+
+# Define o padrão do C++
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Módulo nativo do CMake para baixar dependências da internet
-include(FetchContent)
+# BUSCA DAS BIBLIOTECAS
 
-# Declara onde está o SDL2 e qual versão queremos
-FetchContent_Declare(
-    SDL2
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG release-2.30.2 
-)
+# Busca o motor principal do SDL2
+find_package(SDL2 REQUIRED)
 
-# Executa o download e a configuração do SDL2 nos bastidores
-FetchContent_MakeAvailable(SDL2)
+# Ativa o radar do pkg-config para achar a extensão SDL_ttf
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
 
-# Adiciona o seu executável
+# ARQUIVOS DO PROJETO
 add_executable(${PROJECT_NAME} 
     main.cpp 
     controller/Controller.cpp 
     mouse/Mouse.cpp 
     keyboard/Keyboard.cpp 
-    keyboard/AtalhoTeclasMapper.h
     keyboard/VirtualKeyboard.cpp
 )
 
-# Linka a biblioteca do SDL2 ao seu projeto
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2-static) 
+# LINKAGEM E DIRETÓRIOS
+
+# Força o compilador a achar a pasta dos arquivos .h (Headers)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2_TTF_INCLUDE_DIRS}
+)
+
+# Conecta tudo no executável final (.a e .dll)
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    SDL2::SDL2 
+    SDL2::SDL2main 
+    ${SDL2_TTF_LIBRARIES}
+)
+
+# -------- Configuração de Testes --------
+
+# Cria um executável separado para o teste
+add_executable(ver_teclado 
+    test/visualizar_teclado.cpp 
+    keyboard/VirtualKeyboard.cpp
+)
+
+# Dá acesso aos headers do SDL2 para o target de teste
+target_include_directories(ver_teclado PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2_TTF_INCLUDE_DIRS}
+)
+
+# Linka as bibliotecas do SDL2 no target de teste
+target_link_libraries(ver_teclado PRIVATE 
+    SDL2::SDL2 
+    SDL2::SDL2main 
+    ${SDL2_TTF_LIBRARIES}
+)
